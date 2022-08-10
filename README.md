@@ -24,8 +24,9 @@ Flutter Plugin に限っては Hilt より Dagger を使ったほうがセット
 `onAttachedToEngine` から `onDetachedFromEngine` の `CoroutineScope` を `SupervisorJob` で作る。
 `EventChannel` と `Stream` は `Flow` というより `SharedFlow` と似ているので、
 このスコープで `collect` した結果を流す。
+もしくは Kotlin の `Channel` を使う。
 
-### Activity の状態保存どうする問題
+## Activity の状態保存どうする問題
 
 Plugin の状態は `addOnSaveStateListener` で保存する。
 Plugin のインスタンスに保存しても丸ごと再作成されるので無駄。
@@ -45,3 +46,8 @@ Plugin 側では特になにもせずに
 CI は公式の Example も
 [subosito/flutter-action](https://github.com/subosito/flutter-action)
 を使ってるのでこれで大丈夫なのでは。
+
+## 詰め替えめんどくさい問題
+
+リフレクションで書くなら ProGuard をうまく設定する必要がある。
+ただしそもそも他のライブラリが ProGuard を設定できてなかったりするので Optimize 切りがち。
