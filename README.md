@@ -14,11 +14,6 @@ Flutter Plugin に限っては Hilt より Dagger を使ったほうがセット
 
 ## Coroutine どうする問題
 
-### Activity のスコープ
-
-`lifecycle.coroutineScope` を使う。
-`MethodChannel` で `suspend` な関数を呼び出したければこのスコープで動かす。
-
 ### Engine のスコープ
 
 `onAttachedToEngine` から `onDetachedFromEngine` の `CoroutineScope` を `SupervisorJob` で作る。
@@ -26,12 +21,19 @@ Flutter Plugin に限っては Hilt より Dagger を使ったほうがセット
 このスコープで `collect` した結果を流す。
 もしくは Kotlin の `Channel` を使う。
 
+### Activity のスコープ
+
+`lifecycle.coroutineScope` を使う。
+`MethodChannel` で `suspend` な関数を呼び出したければこのスコープで動かす。
+
+デバッグとかしてるとどうやら `onAttachedToActivity` より先に `onMethodCall` が呼ばれることがあるみたいなので、
+その場合は Engine のスコープで動かすか Attach まではエラーを返す仕様にするあたりが安定。
+
 ## Activity の状態保存どうする問題
 
 Plugin の状態は `addOnSaveStateListener` で保存する。
 Plugin のインスタンスに保存しても丸ごと再作成されるので無駄。
-
-Plugin に ViewModelStoreOwner を実装して ViewModel に保持する方法もあるかも。
+`Activity#onRetainNonConfigurationInstance` に相当するものは無さそう。
 
 Flutter 側は `RestorationMixin` を使う。
 
